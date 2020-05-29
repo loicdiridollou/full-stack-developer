@@ -20,24 +20,27 @@ db.create_all()
 @app.route('/todos/create', methods = ['POST'])
 def create_todo():
     error = False
+    body = {}
     try:
         description = request.get_json()["description"]
         todo = Todo(description = description)
         db.session.add(todo)
         db.session.commit()
+        body['description'] = todo.description
     except:
         error = True
         db.session.rollback()
         print(sys.exc_info())
     finally:
         db.session.close()
-        if not error:
-            return jsonify({'description': todo.description})
+    if not error:
+        return jsonify(body)
+
 
 @app.route('/')
 
 def index():
-    return render_template('index.html', data =Todo.query.all())
+    return render_template('index.html', data = Todo.query.all())
 
 
 if __name__ == "__main__":
