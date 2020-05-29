@@ -1,5 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
+import sys
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://udacity:udacity@localhost:5432/todoapp'
@@ -16,6 +17,22 @@ class Todo(db.Model):
 db.create_all()
 
 
+@app.route('/todos/create', methods = ['POST'])
+def create_todo():
+    error = False
+    try:
+        description = request.get_json()["description"]
+        todo = Todo(description = description)
+        db.session.add(todo)
+        db.session.commit()
+    except:
+        error = True
+        db.session.rollback()
+        print(sys.exc_info())
+    finally:
+        db.session.close()
+        if not error:
+            return jsonify({'description': todo.description})
 
 @app.route('/')
 
