@@ -3,9 +3,31 @@
         <title>Todo App</title>
         <style>
             .hidden {
-                display: none;
+              display: none;
             }
-        </style>
+            ul {
+              list-style: none;
+              padding: 0;
+              margin: 0;
+              width: 300px;
+            }
+            li {
+              clear: both;
+            }
+            li button {
+              -webkit-appearance: none;
+              border: none;
+              outline: none;
+              color: red;
+              float: right;
+              cursor: pointer;
+              font-size: 20px;
+            }
+            .lists-wrapper, .todos-wrapper {
+              display: inline-block;
+              vertical-align: top;
+            }
+          </style>
     </head>
     <body>
 
@@ -16,11 +38,45 @@
         <div id="error" class="hidden">Something went wrong!</div>
         <ul id='todos'>
             {% for d in data %}
-            <li>{{d.description}}</li>
+            <li><input class ="check-completed" data-id="{{ d.id }}" type="checkbox" {% if d.completed %} checked {% endif %}> {{d.description}}
+                <button class="data-deleted" data-id="{{ d.id }}">&cross;</button></li>
             {% endfor %}
         </ul>
 
         <script>
+            const checkboxes = document.querySelectorAll('.check-completed');
+            for (let i = 0; i < checkboxes.length; i++) {
+                const checkbox = checkboxes[i];
+                checkbox.onchange = function(e) {
+                    // console.log('event', e);
+                    const todo_id = e.target.dataset['id'];
+                    // console.log('event', todo_id);
+                    const newCompleted = e.target.checked;
+                    // console.log('event', newCompleted);
+                    fetch('/todos/' + todo_id + '/set-completed', {
+                        method: 'POST',
+                        body: JSON.stringify({'completed': newCompleted}),                    
+                    headers: {'Content-Type': 'application/json'}
+                    })
+                    .then(function(){
+                        document.getElementById('error').className = 'hidden';
+                    })
+                    .catch(function() {
+                        document.getElementById('error').className = '';
+                    })
+                }
+            }
+            const deletes = document.querySelectorAll('.data-deleted');
+            for (let i = 0; i < deletes.length; i++) {
+                const btn = deletes[i];
+                btn.onclick = function(e) {
+                    const todo_id = e.target.dataset['id'];
+                    fetch('/todos/' + todo_id + '/delete', {
+                        method: 'DELETE'
+                    });
+        
+                }
+            }
             document.getElementById("form").onsubmit = function(e) {
                 e.preventDefault();
                 fetch('/todos/create', {
@@ -34,7 +90,7 @@
                     return response.json();
                 })
                 .then(function(jsonResponse){
-                    console.log(jsonResponse);
+                    // console.log(jsonResponse);
                     const liItem = document.createElement('LI');
                     liItem.innerHTML = jsonResponse['description'];
                     document.getElementById('todos').appendChild(liItem);
