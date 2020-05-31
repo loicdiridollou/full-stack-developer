@@ -68,7 +68,6 @@ class Show(db.Model):
     artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'), nullable = False)
 
 
-db.create_all()
 
 #----------------------------------------------------------------------------#
 # Filters.
