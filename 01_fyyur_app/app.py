@@ -13,6 +13,8 @@ import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
+from datetime import datetime
+
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -76,7 +78,6 @@ class Show(db.Model):
     date_show = db.Column(db.DateTime())
 
 
-db.create_all()
 
 
 
@@ -115,31 +116,16 @@ def venues():
   for venue in Venue.query.all():
     if {"city": venue.city, "state": venue.state} not in cities:
       cities.append({"city": venue.city, "state": venue.state})
-    
-  print(cities)
 
+  data = []  
+  for city in cities:
+    venues = Venue.query.filter(Venue.state == city['state'], Venue.city == city['city']).all()
+    tab = []
+    for venue in venues:
+      num_shows = Show.query.filter(Show.venue_id == 1, Show.date_show >= datetime.now()).count()
+      tab.append({"id": venue.id, "name": venue.name, "num_upcoming_shows":num_shows})
+    data.append({"city": city['city'], "state": city['state'], "venues": tab})
   
-  data=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
   return render_template('pages/venues.html', areas=data)
 
 @app.route('/venues/search', methods=['POST'])
@@ -251,9 +237,6 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
-
   error = False
   try:
     name = request.form['name']
@@ -422,8 +405,6 @@ def create_artist_form():
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
   # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
   error = False
   try:
     name = request.form['name']
