@@ -217,4 +217,9 @@ class ArtistForm(Form):
         'facebook_link', validators=[URL()]
     )
 
+    seeking_venue = SelectField(
+        'seek_venue', validators=[DataRequired()],
+        choices = ['Yes', 'No']
+    )
+
 # TODO IMPLEMENT NEW ARTIST FORM AND NEW SHOW FORM
