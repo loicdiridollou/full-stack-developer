@@ -7,7 +7,8 @@
 			{{ artist.name }}
 		</h1>
 		<p class="subtitle">
-			ID: {{ artist.id }}
+			ID: {{ artist.id }} <button class="edit-button" id = "edit-button", data-id="{{ artist.id }}" onclick="location.href = '/artists/{{ artist.id }}/edit'">Edit Artist</button> 
+			
 		</p>
 		<div class="genres">
 			{% for genre in artist.genres %}
@@ -71,6 +72,7 @@
 		{% endfor %}
 	</div>
 </section>
+
 
 {% endblock %}
 

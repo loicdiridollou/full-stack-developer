@@ -7,7 +7,8 @@
 			{{ venue.name }}
 		</h1>
 		<p class="subtitle">
-			ID: {{ venue.id }}
+			ID: {{ venue.id }} <button class="edit-button" id = "edit-button", data-id="{{ venue.id }}" onclick="location.href = '/venues/{{ venue.id }}/edit'">Edit venue</button> 
+			<button class="delete-button" id = "delete-button", data-id="{{ venue.id }}">Delete venue</button>
 		</p>
 		<div class="genres">
 			{% for genre in venue.genres %}
@@ -74,6 +75,26 @@
 		{% endfor %}
 	</div>
 </section>
+<script>
+	const btn = document.getElementById('delete-button');
+	btn.onclick = function(e) {
+		console.log('event', e)
+		const venue_id = e.target.dataset['id'];
+		console.log('event', e)
+		fetch('/venues/' + venue_id, {
+			method: 'DELETE'
+		})
+		.then(function(response){
+			return response.json();
+		})
+		.then(function(jsonResponse){
+			if (jsonResponse['success']){
+				window.location.href = '/';
+			}	
+		})
+	}
+
+</script>
 
 {% endblock %}
 
