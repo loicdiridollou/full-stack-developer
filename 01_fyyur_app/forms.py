@@ -117,14 +117,19 @@ class VenueForm(Form):
         'facebook_link', validators=[URL()]
     )
 
-    seeking_message = StringField(
+    seeking_description = StringField(
         # TODO implement enum restriction
-        'seeking_message'
+        'seeking_description'
     )
-    seeking_artist = SelectField(
+    seeking_talent = SelectField(
         'seek_artist', validators=[DataRequired()],
         choices = ['Yes', 'No'],
         default = 'No'
+    )
+
+    website_link = StringField(
+        # TODO implement enum restriction
+        'website_link', validators=[URL()]
     )
 
 class ArtistForm(Form):
@@ -227,9 +232,14 @@ class ArtistForm(Form):
         'facebook_link', validators=[URL()]
     )
 
-    seeking_message = StringField(
+    website_link = StringField(
         # TODO implement enum restriction
-        'seeking_message'
+        'website_link', validators=[URL()]
+    )
+
+    seeking_description = StringField(
+        # TODO implement enum restriction
+        'seeking_description'
     )
     seeking_venue = SelectField(
         'seek_venue', validators=[DataRequired()],
