@@ -43,11 +43,11 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500))
     website_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-    genre = db.Column(db.String(120))
+    genres = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean())
     seeking_description = db.Column(db.String(500))
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+    # DONETODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
     __tablename__ = 'artist'
@@ -64,9 +64,9 @@ class Artist(db.Model):
     seeking_venue = db.Column(db.Boolean())
     seeking_description = db.Column(db.String(500))
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
+    # DONETODO: implement any missing fields, as a database migration using Flask-Migrate
 
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+# DONETODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
 class Show(db.Model):
     __tablename__ = 'show'
@@ -97,7 +97,12 @@ app.jinja_env.filters['datetime'] = format_datetime
 
 @app.route('/')
 def index():
-  return render_template('pages/home.html')
+  artists = Artist.query.order_by(Artist.id.desc()).limit(3)
+  data = []
+  for artist in artists:
+    data.append({"id": artist.id, "name": artist.name})
+  
+  return render_template('pages/home.html', artists = data)
 
 
 #  Venues
@@ -163,7 +168,7 @@ def show_venue(venue_id):
   data = {
     "id": venue.id,
     "name": venue.name,
-    "genres": venue.genre.split(','),
+    "genres": venue.genres.split(','),
     "address": venue.address,
     "city": venue.city,
     "state": venue.state, 
@@ -179,7 +184,8 @@ def show_venue(venue_id):
     "upcoming_shows_count": len(future_shows),
   }
   
-  
+  # print(data['genres'])
+
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
@@ -202,11 +208,11 @@ def create_venue_submission():
     phone = request.form['phone']
     fb_link = request.form['facebook_link']
     img_link = request.form['image_link']
-    seeking_talent = request.form['seeking_talent']
-    seeking_description = request['seeking_description']
+    seeking_talent = request.form['seeking_talent'] == 'Yes'
+    seeking_description = request.form['seeking_description']
     website_link = request.form['website_link']
 
-    venue = Venue(name = name, address = address, city = city, state = state, phone = phone, genre = genres, facebook_link = fb_link, 
+    venue = Venue(name = name, address = address, city = city, state = state, phone = phone, genres = genres, facebook_link = fb_link, 
     seeking_talent = seeking_talent, seeking_description = seeking_description, image_link = img_link, website_link = website_link)
     db.session.add(venue)
     db.session.commit()
@@ -216,7 +222,8 @@ def create_venue_submission():
     flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
   finally:
     # on successful db insert, flash success
-    flash('Venue ' + request.form['name'] + ' was successfully listed!')
+    if not error:
+      flash('Venue ' + request.form['name'] + ' was successfully listed!')
     # TODO: on unsuccessful db insert, flash an error instead.
     # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
     return render_template('pages/home.html')
@@ -288,14 +295,14 @@ def show_artist(artist_id):
   tab = []
   for show in past_shows:
     venue = Venue.query.filter(Venue.id == show.venue_id).one()
-    tab.append({"venue_id": venue.id, "venue_name": venue.name, "venue_image_link": artist.image_link, "start_time": str(show.date_show)})
+    tab.append({"venue_id": venue.id, "venue_name": venue.name, "venue_image_link": venue.image_link, "start_time": str(show.date_show)})
   past_shows = tab
 
   future_shows = Show.query.filter(Show.artist_id == artist_id, Show.date_show >= datetime.now())
   tab = []
   for show in future_shows:
     venue = Venue.query.filter(Venue.id == show.venue_id).one()
-    tab.append({"venue_id": venue.id, "venue_name": venue.name, "venue_image_link": artist.image_link, "start_time": str(show.date_show)})
+    tab.append({"venue_id": venue.id, "venue_name": venue.name, "venue_image_link": venue.image_link, "start_time": str(show.date_show)})
   future_shows = tab
   
   data = {
@@ -315,6 +322,8 @@ def show_artist(artist_id):
     "past_shows_count": len(past_shows),
     "upcoming_shows_count": len(future_shows),
   }
+
+  print(data['genres'])
 
   return render_template('pages/show_artist.html', artist=data)
 
@@ -354,7 +363,7 @@ def edit_artist_submission(artist_id):
     artist.city = request.form['city']
     artist.state =  request.form['state']
     artist.phone = request.form['phone']
-    artist.facebook_link = request.form['facebook_link']
+    artist.facebook_link = '' if request.form['facebook_link'] == 'None' else request.form['facebook_link']
     artist.seeking_venue = True if request.form['seeking_venue'] == 'Yes' else False
     artist.seeking_description = ''  if request.form['seeking_description'] == 'None' else request.form['seeking_description']
     artist.image_link = request.form['image_link']
@@ -380,7 +389,7 @@ def edit_venue(venue_id):
   venue={
     "id": venue.id,
     "name": venue.name,
-    "genres": venue.genre.split(','),
+    "genres": venue.genres.split(','),
     "city": venue.city,
     "state": venue.state,
     "address": venue.address,
@@ -391,6 +400,8 @@ def edit_venue(venue_id):
     "seeking_description": venue.seeking_description,
     "image_link": venue.image_link
   }
+
+
 
   # TODO: populate form with values from venue with ID <venue_id>
   return render_template('forms/edit_venue.html', form=form, venue=venue)
@@ -404,6 +415,7 @@ def edit_venue_submission(venue_id):
   try:
     venue = Venue.query.filter(Venue.id == venue_id).one()
 
+    print(request.form.getlist('genres'))
     venue.name = request.form['name']
     venue.genres = ','.join(request.form.getlist('genres'))
     venue.city = request.form['city']
@@ -445,10 +457,13 @@ def create_artist_submission():
     state =  request.form['state']
     phone = request.form['phone']
     fb_link = request.form['facebook_link']
+    website_link = request.form['website_link']
+    img_link = request.form['image_link']
+    seeking_venue = request.form['seeking_venue'] == 'Yes'
+    seeking_description = request.form['seeking_description']
 
-    artist = Artist(name = name, city = city, state = state, phone = phone, genres = genres, image_link = '', facebook_link = fb_link, 
-    seeking_venue = False, 
-    seeking_description = '')
+    artist = Artist(name = name, city = city, state = state, phone = phone, genres = genres, image_link = img_link, facebook_link = fb_link, 
+    website_link = website_link, seeking_venue = seeking_venue, seeking_description = seeking_description)
 
     db.session.add(artist)
     db.session.commit()
@@ -472,9 +487,9 @@ def create_artist_submission():
 @app.route('/shows')
 def shows():
   # displays list of shows at /shows
-  # TODO: replace with real venues data.
+  # DONETODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-  
+
   shows = Show.query.all()
   data = []
   for show in shows:
