@@ -5,7 +5,7 @@
 import json
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -41,12 +41,12 @@ class Venue(db.Model):
     address = db.Column(db.String(120))
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
-    web_link = db.Column(db.String(500))
+    website_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     genre = db.Column(db.String(120))
     website = db.Column(db.String(500))
     seeking_talent = db.Column(db.Boolean())
-    seeking_message = db.Column(db.String(500))
+    seeking_description = db.Column(db.String(500))
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -63,7 +63,7 @@ class Artist(db.Model):
     website_link = db.Column(db.String(255))
     facebook_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean())
-    seeking_msg = db.Column(db.String(500))
+    seeking_description = db.Column(db.String(500))
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -169,10 +169,10 @@ def show_venue(venue_id):
     "city": venue.city,
     "state": venue.state, 
     "phone": venue.phone,
-    "website": venue.web_link,
+    "website": venue.website_link,
     "facebook_link": venue.facebook_link,
     "seeking_talent": venue.seeking_talent,
-    "seeking_description": venue.seeking_message,
+    "seeking_description": venue.seeking_description,
     "image_link": venue.image_link,
     "past_shows": past_shows,
     "upcoming_shows": future_shows,
@@ -226,7 +226,25 @@ def delete_venue(venue_id):
 
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+  
+  error = False
+  try:
+    shows = Show.query.filter(Show.venue_id == venue_id)
+    for show in shows:
+      db.session.delete(show)
+    venue = Venue.query.get(venue_id)
+    db.session.delete(venue)
+    db.session.commit()
+  except():
+    db.session.rollback()
+    error = True
+  finally:
+    db.session.close()
+  if error:
+    abort(500)
+  else:
+    return jsonify({'success': True})
+
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -300,18 +318,21 @@ def show_artist(artist_id):
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
   form = ArtistForm()
+  
+  artist = Artist.query.filter(Artist.id == artist_id).one()
+  
   artist={
-    "id": 4,
-    "name": "Guns N Petals",
-    "genres": ["Rock n Roll"],
-    "city": "San Francisco",
-    "state": "CA",
-    "phone": "326-123-5000",
-    "website": "https://www.gunsnpetalsband.com",
-    "facebook_link": "https://www.facebook.com/GunsNPetals",
-    "seeking_venue": True,
-    "seeking_description": "Looking for shows to perform at in the San Francisco Bay Area!",
-    "image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80"
+    "id": artist.id,
+    "name": artist.name,
+    "genres": artist.genres.split(','),
+    "city": artist.city,
+    "state": artist.state,
+    "phone": artist.phone,
+    "website": artist.website_link,
+    "facebook_link": artist.facebook_link,
+    "seeking_venue": artist.seeking_venue,
+    "seeking_description": artist.seeking_description,
+    "image_link": artist.image_link
   }
   # TODO: populate form with fields from artist with ID <artist_id>
   return render_template('forms/edit_artist.html', form=form, artist=artist)
@@ -371,7 +392,7 @@ def create_artist_submission():
 
     artist = Artist(name = name, city = city, state = state, phone = phone, genres = genres, image_link = '', facebook_link = fb_link, 
     seeking_venue = False, 
-    seeking_msg = '')
+    seeking_description = '')
 
     db.session.add(artist)
     db.session.commit()
