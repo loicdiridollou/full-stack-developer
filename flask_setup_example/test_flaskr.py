@@ -56,6 +56,13 @@ class BookTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['created'])
+ 
+    def test_search(self):
+        search_val = 'g'
+        results = self.db.query.like('%'+g+'%')
+        pass
+
+
 
 
 
