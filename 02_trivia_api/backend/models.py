@@ -54,7 +54,7 @@ class Question(db.Model):
       'id': self.id,
       'question': self.question,
       'answer': self.answer,
-      'category': self.category,
+      'category': str(int(self.category)-1),
       'difficulty': self.difficulty
     }
 

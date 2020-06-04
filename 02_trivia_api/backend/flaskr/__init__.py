@@ -20,7 +20,14 @@ def create_app(test_config=None):
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     def paginate_questions(request, selection):
-        page = request.args.get('page', 1, type = int)
+        page = request.args.get('page', 1, type=int)
+        start =  (page - 1) * QUESTIONS_PER_PAGE
+        end = start + QUESTIONS_PER_PAGE
+
+        questions = [question.format() for question in selection]
+
+        return questions[start:end]
+
 
 
     @app.route('/')
@@ -38,31 +45,67 @@ def create_app(test_config=None):
         return response
 
     '''
-    @TODO: 
+    @TODODONE: 
     Create an endpoint to handle GET requests 
     for all available categories.
     '''
 
-    @app.route('/questions', methods=['GET'])
-    def get_questions():
-        selection = Question.query.all()
-        lst = []
-        for question in selection:
-            lst.append({"question": question.question, "answer": question.answer, "category": question.category, "difficulty": question.difficulty})
-        return jsonify({"success": True, "questions": lst})
+    @app.route('/categories', methods = ['GET'])
+    def get_categories():
+        categories = Category.query.all()
+
+        if not categories:
+            abort(404)
+        
+        categories_all = [cat.format() for cat in categories]
+
+        categories_returned = []
+        for cat in categories_all:
+            categories_returned.append(cat['type'])
+        
+        return jsonify({"success": True, "categories": categories_returned})
+
+    
 
     '''
-    @TODO: 
+    @TODODONE: 
     Create an endpoint to handle GET requests for questions, 
     including pagination (every 10 questions). 
     This endpoint should return a list of questions, 
     number of total questions, current category, categories. 
+
 
     TEST: At this point, when you start the application
     you should see questions and categories generated,
     ten questions per page and pagination at the bottom of the screen for three pages.
     Clicking on the page numbers should update the questions. 
     '''
+
+    @app.route('/questions', methods=['GET'])
+    def get_questions():
+        selection = Question.query.order_by(Question.id).all()
+        questions_paginated = paginate_questions(request, selection)
+        if len(questions_paginated) == 0:
+            abort(404)
+        
+        
+        
+        categories = Category.query.all()
+        categories_all = [category.format() for category in categories]
+        
+        # Initialize empty list to be filled & returned
+        categories_returned = []
+        for cat in categories_all:
+            categories_returned.append(cat['type'])
+        return jsonify({
+        'success': True,
+        'questions': questions_paginated,
+        'total_questions': len(selection),
+        'categories' : categories_returned,
+        'current_category' : categories_returned
+        })
+
+
 
     '''
     @TODO: 
@@ -71,6 +114,17 @@ def create_app(test_config=None):
     TEST: When you click the trash icon next to a question, the question will be removed.
     This removal will persist in the database and when you refresh the page. 
     '''
+
+    @app.route('/questions/<question_id>', methods = ['DELETE'])
+    def delete_question(question_id):
+        question = Question.query.filter(Question.id == question_id).one_or_none()
+        if question is None:
+            abort(404, {'Question does not exist'})
+        try:
+            question.delete()
+            return jsonify({"success": True, "deleted": question_id})
+        except:
+            abort(422)
 
     '''
     @TODO: 
@@ -82,6 +136,16 @@ def create_app(test_config=None):
     the form will clear and the question will appear at the end of the last page
     of the questions list in the "List" tab.  
     '''
+
+    @app.route('/questions', methods = ['POST'])
+    def create_question():
+        body = request.get_json()
+        if not body:
+            abort(400)
+        search_term = body.get('search_term', None)
+        if search:
+            question = Question.query.ilike(search_term)
+
 
     '''
     @TODO: 
