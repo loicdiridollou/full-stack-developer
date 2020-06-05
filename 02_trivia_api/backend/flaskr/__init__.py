@@ -270,7 +270,7 @@ def create_app(test_config=None):
         previous_questions = body.get('previous_questions', None)
         current_category = body.get('current_category', None)
         if current_category:
-            cat = Category.query.filter(Category.id = str(current_category['id'])).one_or_none()
+            cat = Category.query.filter(Category.id == str(current_category['id'])).one_or_none()
             if cat is None:
                 abort(404)
 
