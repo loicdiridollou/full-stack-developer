@@ -1,7 +1,10 @@
 .vscode
 __pycache__
 venv
-
+node_modules
+pip
+package-lock.json
+package.json
 # OS generated files #
 ######################
 .DS_Store
