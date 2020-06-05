@@ -15,7 +15,8 @@ def create_app(test_config=None):
     setup_db(app)
         
     '''
-    @TODODONE: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
+    @TODODONE: Set up CORS. Allow '*' for origins. Delete the sample route 
+    after completing the TODOs
     '''
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
@@ -40,8 +41,10 @@ def create_app(test_config=None):
     '''
     @app.after_request
     def after_request(response):
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
-        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        response.headers.add('Access-Control-Allow-Headers', 
+            'Content-Type,Authorization,true')
+        response.headers.add('Access-Control-Allow-Methods', 
+            'GET,PUT,POST,DELETE,OPTIONS')
         return response
 
     '''
@@ -77,7 +80,8 @@ def create_app(test_config=None):
 
     TEST: At this point, when you start the application
     you should see questions and categories generated,
-    ten questions per page and pagination at the bottom of the screen for three pages.
+    ten questions per page and pagination at the bottom of the screen for 
+    three pages.
     Clicking on the page numbers should update the questions. 
     '''
 
@@ -111,7 +115,8 @@ def create_app(test_config=None):
     @TODODONE: 
     Create an endpoint to DELETE question using a question ID. 
 
-    TEST: When you click the trash icon next to a question, the question will be removed.
+    TEST: When you click the trash icon next to a question, the question will 
+    be removed.
     This removal will persist in the database and when you refresh the page. 
     '''
 
@@ -164,7 +169,7 @@ def create_app(test_config=None):
                 abort(404, {'message': 'no questions that contains "{}" found.'.format(search_term)})
             
             questions_found = [question.format() for question in questions]
-            selections = Question.query.order_by(Question.id).all() # needed for total_questions
+            selections = Question.query.order_by(Question.id).all()
             
             categories = Category.query.all()
             categories_all = [category.format() for category in categories]
@@ -181,11 +186,14 @@ def create_app(test_config=None):
         new_difficulty = body.get('difficulty', None)
         new_category = body.get('category', None)
 
-        if not new_answer or not new_question or not new_difficulty or not new_category:
+        if not new_answer or not new_question:
+            abort(400)
+        if not new_difficulty or not new_category:
             abort(400)
         
         try:
-            question = Question(question = new_question, difficulty = new_difficulty, answer = new_answer, category = new_category)
+            question = Question(question = new_question, difficulty = new_difficulty, 
+                answer = new_answer, category = new_category)
             question.insert()
             selections = Question.query.order_by(Question.id).all()
             questions_paginated = paginate_questions(request, selections)
@@ -261,16 +269,29 @@ def create_app(test_config=None):
         
         previous_questions = body.get('previous_questions', None)
         current_category = body.get('current_category', None)
+        if current_category:
+            cat = Category.query.filter(Category.id = str(current_category['id'])).one_or_none()
+            if cat is None:
+                abort(404)
 
         if previous_questions:
             if current_category:
-                questions_raw = Question.query.filter(Question.category == str(current_category['id'])).filter(Question.id.notin_(previous_questions)).all()
+                if current_category == "0":
+                    questions_raw = Question.query.all()
+                else:
+                    questions_raw = Question.query.filter(Question.category == 
+                        str(current_category['id'])).filter(Question.id.notin_(previous_questions)).all()
             else:
                 questions_raw = Question.query.filter(Question.id.notin_(previous_questions)).all()
+                if len(questions_raw) == 0:
+                    return jsonify({"success": True, "question": None})
 
         else:
             if current_category:
-                questions_raw = Question.query.filter(Question.category == str(current_category['id'])).all()
+                if current_category == "0":
+                    questions_raw = Question.query.all()
+                else:
+                    questions_raw = Question.query.filter(Question.category == str(current_category['id'])).all()
             else:
                 questions_raw = Question.query.all()
         
@@ -309,7 +330,9 @@ def create_app(test_config=None):
 
     @app.errorhandler(422)
     def unprocessable(error):
-        return jsonify({"success": False, "error": 422, "message": "Unprocessable"}), 422
+        return jsonify({"success": False, 
+            "error": 422, 
+            "message": "Unprocessable"}), 422
 
     return app
 
