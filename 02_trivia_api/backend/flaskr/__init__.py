@@ -163,10 +163,10 @@ def create_app(test_config=None):
             abort(404)
             
         if search_term:
-            questions = Question.query.filter(Question.question.contains(search_term)).all()
+            questions = Question.query.filter(Question.question.ilike("%"+search_term+"%")).all()
 
             if not questions:
-                abort(404, {'message': 'no questions that contains "{}" found.'.format(search_term)})
+                return jsonify({"success": True, "question": None})
             
             questions_found = [question.format() for question in questions]
             selections = Question.query.order_by(Question.id).all()
@@ -222,9 +222,7 @@ def create_app(test_config=None):
 
     @app.route('/categories/<category_id>/questions', methods = ['GET'])
     def get_questions_by_cat(category_id):
-        print(str(int(category_id)+1))
         selection = Question.query.filter(Question.category == str(int(category_id)+1)).order_by(Question.id).all()
-        print([ques for ques in selection])
         questions_paginated = paginate_questions(request, selection)
         if len(questions_paginated) == 0:
             abort(400)
@@ -268,7 +266,7 @@ def create_app(test_config=None):
             abort(400)
         
         previous_questions = body.get('previous_questions', None)
-        current_category = body.get('current_category', None)
+        current_category = body.get('quiz_category', None)
         if current_category:
             cat = Category.query.filter(Category.id == str(current_category['id'])).one_or_none()
             if cat is None:
