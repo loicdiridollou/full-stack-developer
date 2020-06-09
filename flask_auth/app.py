@@ -7,9 +7,9 @@ from urllib.request import urlopen
 
 app = Flask(__name__)
 
-AUTH0_DOMAIN = @TODO_REPLACE_WITH_YOUR_DOMAIN
+AUTH0_DOMAIN = ''
 ALGORITHMS = ['RS256']
-API_AUDIENCE = @TODO_REPLACE_WITH_YOUR_API_AUDIENCE
+API_AUDIENCE = ''
 
 
 class AuthError(Exception):
@@ -50,7 +50,7 @@ def get_token_auth_header():
     token = parts[1]
     return token
 
-
+'''
 def verify_decode_jwt(token):
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
@@ -103,17 +103,17 @@ def verify_decode_jwt(token):
                 'code': 'invalid_header',
                 'description': 'Unable to find the appropriate key.'
             }, 400)
-
+'''
 
 def requires_auth(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         token = get_token_auth_header()
-        try:
-            payload = verify_decode_jwt(token)
-        except:
-            abort(401)
-        return f(payload, *args, **kwargs)
+        # try:
+        #     payload = verify_decode_jwt(token)
+        # except:
+        #     abort(401)
+        return f(token, *args, **kwargs)
 
     return wrapper
 
