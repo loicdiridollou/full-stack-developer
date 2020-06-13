@@ -57,7 +57,7 @@ def get_drinks():
 '''
 
 @app.route('/drinks-detail', methods = ["GET"])
-# @requires_auth()
+@requires_auth('get:drinks-detail')
 def drinks_detail(payload):
     return jsonify({"success": True, 'drinks': get_all_drinks("long")})
 
@@ -70,6 +70,23 @@ def drinks_detail(payload):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+
+@app.route('/drinks',  methods=['POST'])
+@requires_auth('post:drinks')
+def create_drink(payload):
+    """Creates new drink and returns it to client"""
+    
+    body = request.get_json()
+
+
+    new_drink = Drink(title = body['title'], recipe = """{}""".format(body['recipe']))
+    
+    new_drink.insert()
+    new_drink.recipe = body['recipe']
+    return jsonify({
+    'success': True,
+    'drinks': Drink.long(new_drink)
+    })
 
 
 '''
