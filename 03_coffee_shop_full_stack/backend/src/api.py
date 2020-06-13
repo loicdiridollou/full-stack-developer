@@ -19,6 +19,17 @@ CORS(app)
 #db_drop_and_create_all()
 
 
+def get_all_drinks(recipe_format):
+    all_drinks = Drink.query.order_by(Drink.id).all()
+
+    if recipe_format.lower() == 'short':
+        drinks_formatted = [drink.short() for drink in all_drinks]
+    elif recipe_format.lower() == 'long':
+        drinks_formatted = [drink.long() for drink in all_drinks]
+    else:
+        abort(500)
+    return drinks_formatted
+
 
 
 ## ROUTES
@@ -33,9 +44,8 @@ CORS(app)
 
 @app.route('/drinks', methods = ["GET"])
 def get_drinks():
-    
+    return jsonify({"success": True, "drinks": get_all_drinks('short')})
 
-    return json {"success": True, "drinks": get_all_drinks()}
 
 '''
 @TODO implement endpoint
@@ -46,6 +56,10 @@ def get_drinks():
         or appropriate status code indicating reason for failure
 '''
 
+@app.route('/drinks-detail', methods = ["GET"])
+# @requires_auth()
+def drinks_detail(payload):
+    return jsonify({"success": True, 'drinks': get_all_drinks("long")})
 
 '''
 @TODO implement endpoint
@@ -107,7 +121,7 @@ def unprocessable(error):
 '''
 
 '''
-@TODO implement error handler for 404
+@TODODONE implement error handler for 404
     error handler should conform to general task above 
 '''
 
@@ -125,3 +139,5 @@ def not_found(error):
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+
+
