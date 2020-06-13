@@ -16,7 +16,10 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-# db_drop_and_create_all()
+#db_drop_and_create_all()
+
+
+
 
 ## ROUTES
 '''
@@ -28,6 +31,11 @@ CORS(app)
         or appropriate status code indicating reason for failure
 '''
 
+@app.route('/drinks', methods = ["GET"])
+def get_drinks():
+    
+
+    return json {"success": True, "drinks": get_all_drinks()}
 
 '''
 @TODO implement endpoint
@@ -102,6 +110,15 @@ def unprocessable(error):
 @TODO implement error handler for 404
     error handler should conform to general task above 
 '''
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+                    "success": False, 
+                    "error": 404,
+                    "message": "resource not found"
+                    }), 404
+
 
 
 '''
