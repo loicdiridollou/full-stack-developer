@@ -78,6 +78,8 @@ def create_drink(payload):
     
     body = request.get_json()
 
+    if body is None:
+        return 
 
     new_drink = Drink(title = body['title'], recipe = """{}""".format(body['recipe']))
     
@@ -100,6 +102,31 @@ def create_drink(payload):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
+
+@app.route('/drinks/<drink_id>', methods = ["PATCH"])
+def patch_drinks(drink_id):
+    body = request.get_json()
+    
+    if not body:
+        abort(400)
+    
+    up_title = body.get('title', None)
+    up_recipe = body.get('recipe', None)
+
+    drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+    
+    if up_title:
+        drink.title = body['title']
+    if up_recipe:
+        drink.recipe = body['recipe']
+    
+    drink.
+    new_drink.insert()
+    new_drink.recipe = body['recipe']
+    return jsonify({
+    'success': True,
+    'drinks': Drink.long(new_drink)
+    })
 
 
 '''
@@ -158,4 +185,4 @@ def not_found(error):
 '''
 @app.errorhandler(AuthError)
 def authentification_failed(AuthError):
-    return jsonify({"success": False, })
+    return jsonify({"success": False, "error": AuthError.status_code, "message": AuthError.error}), 401
