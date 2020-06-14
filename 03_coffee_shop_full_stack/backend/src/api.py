@@ -81,8 +81,9 @@ def create_drink(payload):
     if body is None:
         return 
 
-    new_drink = Drink(title = body['title'], recipe = """{}""".format(body['recipe']))
-    
+    new_drink = Drink(title = body['title'], recipe = json.dumps(body['recipe']))
+
+   
     new_drink.insert()
     new_drink.recipe = body['recipe']
     return jsonify({
@@ -105,9 +106,10 @@ def create_drink(payload):
 
 @app.route('/drinks/<drink_id>', methods = ["PATCH"])
 @requires_auth('patch:drinks')
-def patch_drinks(drink_id):
+def patch_drinks(payload, drink_id):
     body = request.get_json()
-    
+    print(drink_id)
+
     if not body:
         abort(400)
     
@@ -142,7 +144,7 @@ def patch_drinks(drink_id):
 
 @app.route('/drinks/<drink_id>', methods = ["DELETE"])
 @requires_auth('delete:drinks')
-def delete_drinks(drink_id):
+def delete_drinks(payload, drink_id):
     drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
     
     if not drink:
