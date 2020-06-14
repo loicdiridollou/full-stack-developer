@@ -104,6 +104,7 @@ def create_drink(payload):
 '''
 
 @app.route('/drinks/<drink_id>', methods = ["PATCH"])
+@requires_auth('patch:drinks')
 def patch_drinks(drink_id):
     body = request.get_json()
     
@@ -120,12 +121,11 @@ def patch_drinks(drink_id):
     if up_recipe:
         drink.recipe = body['recipe']
     
-    drink.
-    new_drink.insert()
-    new_drink.recipe = body['recipe']
+    drink.update()
+    
     return jsonify({
     'success': True,
-    'drinks': Drink.long(new_drink)
+    'drinks': [Drink.long(drink)]
     })
 
 
@@ -139,6 +139,22 @@ def patch_drinks(drink_id):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+
+@app.route('/drinks/<drink_id>', methods = ["DELETE"])
+@requires_auth('delete:drinks')
+def delete_drinks(drink_id):
+    drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+    
+    if not drink:
+        abort(401)
+
+    
+    drink.delete()
+    
+    return jsonify({
+    'success': True,
+    'delete': 'drink_id'
+    })
 
 
 ## Error Handling
