@@ -55,7 +55,8 @@ def require_jwt(function):
 
 @APP.route('/', methods=['POST', 'GET'])
 def health():
-    return jsonify("Healthy")
+    print('abc')
+    return 'Hello World!' #jsonify("Healthy")
 
 
 @APP.route('/auth', methods=['POST'])
@@ -108,5 +109,6 @@ def _get_jwt(user_data):
                'email': user_data['email']}
     return jwt.encode(payload, JWT_SECRET, algorithm='HS256')
 
+
 if __name__ == '__main__':
-    APP.run(host='127.0.0.1', port=8080, debug=True)
+    APP.run(debug=True, host='0.0.0.0')
