@@ -10,6 +10,7 @@ from flask import Flask, jsonify, request, abort
 
 JWT_SECRET = os.environ.get('JWT_SECRET', 'abc123abc1234')
 LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
+print(JWT_SECRET)
 
 
 def _logger():
@@ -111,4 +112,4 @@ def _get_jwt(user_data):
 
 
 if __name__ == '__main__':
-    APP.run(debug=True, host='0.0.0.0')
+    APP.run(debug=True, host='0.0.0.0', port = 8088)
