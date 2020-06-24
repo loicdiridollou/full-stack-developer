@@ -1,4 +1,3 @@
-  
 import os
 from sqlalchemy import Column, String, Integer, create_engine, Date, Float
 from flask_sqlalchemy import SQLAlchemy
