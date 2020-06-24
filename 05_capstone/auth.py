@@ -7,7 +7,7 @@ from config import auth0_config
 
 AUTH0_DOMAIN = auth0_config['AUTH0_DOMAIN']
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'image'
+API_AUDIENCE = 'music'
 
 
 class AuthError(Exception):
