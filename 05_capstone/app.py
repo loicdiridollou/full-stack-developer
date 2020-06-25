@@ -47,7 +47,13 @@ def create_app(test_config=None):
     @app.route('/actors', methods=['GET'])
     @requires_auth('read:actors')
     def get_actors(payload):
-        return jsonify({"message": "access granted"})
+        actors_raw = Actor.query.all()
+        actors_paginated = paginate_results(request, actors_raw)
+
+        if len(actors_paginated) == 0:
+            abort(404)
+
+        return jsonify({"success": True, "actors": actors_paginated}), 200
 
 
     @app.route('/actors', methods=['POST'])
