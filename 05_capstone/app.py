@@ -59,37 +59,118 @@ def create_app(test_config=None):
     @app.route('/actors', methods=['POST'])
     @requires_auth('create:actors')
     def insert_actors(payload):
-        return jsonify({"message": "access granted"})
+        body = request.get_json()
+
+        if body is None:
+            abort(400)
+        
+        name = body.get("name")
+        age = body.get("age")
+        gender = body.get("gender", "Other")
+
+        if not name or not age:
+            abort(422)
+
+        new_actor = Actor(name = name, age = age, gender = gender)
+        new_actor.insert()
+        
+        return jsonify({"success": True, "created": new_actor.id})
 
 
     @app.route('/actors/<actor_id>', methods=['PATCH'])
     @requires_auth('edit:actors')
     def edit_actors(payload, actor_id):
-        return jsonify({"message": "access granted"})
+        body = request.get_json()
+        actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
+
+        if body is None:
+            abort(400)
+        if actor is None:
+            abort(400)
+        
+        name = body.get("name")
+        age = body.get("age")
+        gender = body.get("gender", "Other")
+
+        if name:
+            actor.name = name
+        if age:
+            actor.age = age
+        if gender:
+            actor.gender = gender
+        
+        actor.update()
+        
+        return jsonify({"success": True, "updated": actor.id})
 
 
     @app.route('/actors/<actor_id>', methods=['DELETE'])
     @requires_auth('delete:actors')
     def delete_actors(payload, actor_id):
-        return jsonify({"message": "access granted"})
+        actor = Actor.query.filter(Actor.id == actor_id).one_or_none()
+
+        if not actor:
+            abort(400)
+        
+        actor.delete()
+
+        return jsonify({"success": True, "deleted": actor_id})
 
 
     @app.route('/movies', methods=['GET'])
     @requires_auth('read:movies')
     def get_movies(payload):
-        return jsonify({"message": "access granted"})
+        movies_raw = Movie.query.all()
+        movies_paginated = paginate_results(request, movies_raw)
+
+        if len(movies_paginated) == 0:
+            abort(404)
+
+        return jsonify({"success": True, "actors": movies_paginated}), 200
 
 
     @app.route('/movies', methods=['POST'])
     @requires_auth('create:movies')
     def insert_movies(payload):
-        return jsonify({"message": "access granted"})
+        body = request.get_json()
 
+        if body is None:
+            abort(400)
+        
+        title = body.get("title")
+        release_date = body.get("release_date", "Wed, 24 Jun 2020 00:00:00 GMT")
+
+        if not title:
+            abort(422)
+
+        new_movie = Movie(title = title, release_date = release_date)
+        new_movie.insert()
+        
+        return jsonify({"success": True, "created": new_movie.id})
+        
 
     @app.route('/movies/<movie_id>', methods=['PATCH'])
     @requires_auth('edit:movies')
     def edit_movies(payload, movie_id):
-        return jsonify({"message": "access granted"})
+        body = request.get_json()
+        movie = Movie.query.filter(Movie.id == movie_id).one_or_none()
+
+        if body is None:
+            abort(400)
+        if actor is None:
+            abort(400)
+        
+        title = body.get("title")
+        release_date = body.get("age")
+       
+        if title:
+            movie.title = title
+        if release_date:
+            movie.release_date = release_date
+        
+        movie.update()
+        
+        return jsonify({"success": True, "updated": movie.id})
 
 
     @app.route('/movies/<movie_id>', methods=['DELETE'])
@@ -110,6 +191,13 @@ def create_app(test_config=None):
                         "message": "unprocessable"
                         }), 422
 
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+                        "success": False, 
+                        "error": 400,
+                        "message": "bad request"
+                        }), 400
 
     @app.errorhandler(404)
     def not_found(error):
