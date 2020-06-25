@@ -40,27 +40,26 @@ def db_init_records():
         release_date = date.today()
         ))
 
-    new_performance = Performance.insert().values(
-        Movie_id = new_movie.id,
-        Actor_id = new_actor.id,
-        actor_fee = 500.00
-    )
+    # new_performance = Performance.insert().values(
+    #     Movie_id = new_movie.id,
+    #     Actor_id = new_actor.id,
+    #     actor_fee = 500.00
+    # )
 
     new_actor.insert()
     new_movie.insert()
-    db.session.execute(new_performance) 
+    #db.session.execute(new_performance) 
     db.session.commit()
 
 #----------------------------------------------------------------------------#
 # Performance Junction Object N:N 
 #----------------------------------------------------------------------------#
 
-# Instead of creating a new Table, the documentation recommends to create a association table
-Performance = db.Table('Performance', db.Model.metadata,
-    db.Column('Movie_id', db.Integer, db.ForeignKey('movies.id')),
-    db.Column('Actor_id', db.Integer, db.ForeignKey('actors.id')),
-    db.Column('actor_fee', db.Float)
-)
+# Performance = db.Table('Performance', db.Model.metadata,
+#     db.Column('Movie_id', db.Integer, db.ForeignKey('movies.id')),
+#     db.Column('Actor_id', db.Integer, db.ForeignKey('actors.id')),
+#     db.Column('actor_fee', db.Float)
+# )
 
 #----------------------------------------------------------------------------#
 # Actors Model 
@@ -108,7 +107,7 @@ class Movie(db.Model):
   id = Column(Integer, primary_key=True)
   title = Column(String)
   release_date = Column(Date)
-  actors = db.relationship('Actor', secondary=Performance, backref=db.backref('performances', lazy='joined'))
+  actors = Column(String) #db.relationship('Actor', secondary=Performance, backref=db.backref('performances', lazy='joined'))
 
   def __init__(self, title, release_date) :
     self.title = title
@@ -131,3 +130,5 @@ class Movie(db.Model):
       'title' : self.title,
       'release_date': self.release_date
     }
+  
+  # Instead of creating a new Table, the documentation recommends to create a association table
