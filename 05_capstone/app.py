@@ -157,7 +157,7 @@ def create_app(test_config=None):
 
         if body is None:
             abort(400)
-        if actor is None:
+        if movie is None:
             abort(400)
         
         title = body.get("title")
@@ -176,7 +176,15 @@ def create_app(test_config=None):
     @app.route('/movies/<movie_id>', methods=['DELETE'])
     @requires_auth('delete:movies')
     def delete_movies(payload, movie_id):
-        return jsonify({"message": "access granted"})
+        movie = Movie.query.filter(Movie.id == movie_id).one_or_none()
+
+        if not movie:
+            abort(400)
+        
+        movie.delete()
+
+        return jsonify({"success": True, "deleted": movie_id})
+
 
 
     #----------------------------------------------------------------------------#
