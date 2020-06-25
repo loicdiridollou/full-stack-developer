@@ -5,7 +5,7 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 from app import create_app
 from models import setup_db, db_drop_and_create_all, Actor, Movie, Performance, db_drop_and_create_all
-from config import tokens
+from config import tokens, database_url
 from sqlalchemy import desc
 from datetime import date
 
@@ -28,7 +28,7 @@ class AppTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app()
         self.client = self.app.test_client
-        self.database_path = os.environ['database_url']
+        self.database_path = os.environ.get('database_url', database_url)
         setup_db(self.app, self.database_path)
         db_drop_and_create_all()
         # binds the app to the current context
@@ -46,13 +46,14 @@ class AppTestCase(unittest.TestCase):
             'age' : 25
         } 
 
-        res = self.client().post('/actors', json = json_create_actor, headers = casting_director_auth_header)
+        res = self.client().post('/actors', json = json_create_actor, headers = executive_producer_auth_header)
         data = json.loads(res.data)
-
+        print(data)
         self.assertEqual(res.status_code, 200)
         self.assertTrue(data['success'])
         self.assertEqual(data['created'], 2)
-    
+
+''' 
     def test_error_401_new_actor(self):
         """Test POST new actor w/o Authorization."""
 
@@ -97,6 +98,7 @@ class AppTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 401)
         self.assertFalse(data['success'])
+
 
     def test_error_404_get_actors(self):
         """Test Error GET all actors."""
@@ -292,7 +294,7 @@ class AppTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 404)
         self.assertFalse(data['success'])
-
+'''
 
 if __name__ == "__main__":
     unittest.main()
