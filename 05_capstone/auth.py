@@ -7,7 +7,7 @@ from config import auth0_config
 
 AUTH0_DOMAIN = auth0_config['AUTH0_DOMAIN']
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'music'
+API_AUDIENCE = 'image'
 
 
 class AuthError(Exception):
@@ -68,9 +68,9 @@ def get_token_auth_header():
     return true otherwise
 '''
 def check_permissions(permission, payload):
-    print(payload)
-    print(permission)
-    print(payload['permissions'])
+    print(1, payload)
+    print(2, permission)
+    print(3, payload['permissions'])
     
     if 'permissions' not in payload:
         raise AuthError({"code": "unauthorized", "description": "Permission not included in JWT"}, 400)
