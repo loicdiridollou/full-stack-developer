@@ -68,10 +68,6 @@ def get_token_auth_header():
     return true otherwise
 '''
 def check_permissions(permission, payload):
-    print(1, payload)
-    print(2, permission)
-    print(3, payload['permissions'])
-    
     if 'permissions' not in payload:
         raise AuthError({"code": "unauthorized", "description": "Permission not included in JWT"}, 400)
     
