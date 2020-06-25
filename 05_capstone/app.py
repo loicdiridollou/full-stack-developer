@@ -3,7 +3,7 @@ from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from auth import AuthError, requires_auth
-#from models import db_drop_and_create_all, setup_db, Actor, Movie, Performance
+from models import db_drop_and_create_all, setup_db, Actor, Movie, Performance
 from config import pagination
 
 ROWS_PER_PAGE = pagination['example']
@@ -11,6 +11,9 @@ ROWS_PER_PAGE = pagination['example']
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
+    setup_db(app)
+    #db_drop_and_create_all()
+
     CORS(app)
 
 
@@ -38,55 +41,55 @@ def create_app(test_config=None):
 
     @app.route('/')
     def index_page():
-        return jsonify({"message": "Hello World!"})
+        return jsonify({"message": "Healthy"})
 
 
     @app.route('/actors', methods=['GET'])
     @requires_auth('read:actors')
     def get_actors(payload):
-        pass
+        return jsonify({"message": "access granted"})
 
 
     @app.route('/actors', methods=['POST'])
     @requires_auth('create:actors')
     def insert_actors(payload):
-        pass
+        return jsonify({"message": "access granted"})
 
 
     @app.route('/actors/<actor_id>', methods=['PATCH'])
     @requires_auth('edit:actors')
     def edit_actors(payload, actor_id):
-        pass
+        return jsonify({"message": "access granted"})
 
 
     @app.route('/actors/<actor_id>', methods=['DELETE'])
     @requires_auth('delete:actors')
     def delete_actors(payload, actor_id):
-        pass
+        return jsonify({"message": "access granted"})
 
 
     @app.route('/movies', methods=['GET'])
     @requires_auth('read:movies')
     def get_movies(payload):
-        pass
+        return jsonify({"message": "access granted"})
 
 
     @app.route('/movies', methods=['POST'])
     @requires_auth('create:movies')
     def insert_movies(payload):
-        pass
+        return jsonify({"message": "access granted"})
 
 
     @app.route('/movies/<movie_id>', methods=['PATCH'])
     @requires_auth('edit:movies')
     def edit_movies(payload, movie_id):
-        pass
+        return jsonify({"message": "access granted"})
 
 
     @app.route('/movies/<movie_id>', methods=['DELETE'])
     @requires_auth('delete:movies')
     def delete_movies(payload, movie_id):
-        pass
+        return jsonify({"message": "access granted"})
 
 
     #----------------------------------------------------------------------------#
