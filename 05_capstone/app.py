@@ -3,47 +3,42 @@ from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from auth import AuthError, requires_auth
-from models import db_drop_and_create_all, setup_db, Actor, Movie #, Performance
+from models import db_reset, db_setup, Actor, Movie
 from config import pagination
 
 ROWS_PER_PAGE = pagination['example']
 
 def create_app(test_config=None):
-    # create and configure the app
     app = Flask(__name__)
-    setup_db(app)
-    #db_drop_and_create_all()
+    db_setup(app)
+    #db_reset()
 
     CORS(app)
 
 
     def paginate_results(request, selection):
-        '''Paginates and formats database queries
-        Parameters:
-        * <HTTP object> request, that may contain a "page" value
-        * <database selection> selection of objects, queried from database
-        
-        Returns:
-        * <list> list of dictionaries of objects, max. 10 objects
-        '''
-        # Get page from request. If not given, default to 1
+        # Same function as I used in one of the previous submissions to return only X rows per page (cf Trivia API)
         page = request.args.get('page', 1, type=int)
         
-        # Calculate start and end slicing
         start =  (page - 1) * ROWS_PER_PAGE
         end = start + ROWS_PER_PAGE
 
-        # Format selection into list of dicts and return sliced
         objects_formatted = [object_name.format() for object_name in selection]
         return objects_formatted[start:end]
 
 
+    ########################################
+    # Endpoints
+    ########################################
 
     @app.route('/')
     def index_page():
         return jsonify({"message": "Healthy"})
 
 
+    ########################################
+    # Actors endpoints for GET, POST, PATCH, DELETE
+    
     @app.route('/actors', methods=['GET'])
     @requires_auth('read:actors')
     def get_actors(payload):
@@ -117,6 +112,9 @@ def create_app(test_config=None):
         return jsonify({"success": True, "deleted": actor_id})
 
 
+    ########################################
+    # Movies endpoints for GET, POST, PATCH, DELETE
+
     @app.route('/movies', methods=['GET'])
     @requires_auth('read:movies')
     def get_movies(payload):
@@ -187,9 +185,9 @@ def create_app(test_config=None):
 
 
 
-    #----------------------------------------------------------------------------#
+    ########################################
     # Error Handlers
-    #----------------------------------------------------------------------------#
+    ########################################
 
     @app.errorhandler(422)
     def unprocessable(error):
@@ -226,7 +224,6 @@ def create_app(test_config=None):
 
 
 app = create_app()
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
