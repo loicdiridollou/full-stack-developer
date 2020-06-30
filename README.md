@@ -6,7 +6,7 @@ The tech stack that I used all along is mostly Python and some inputs of JavaScr
 
 ## Project 1: Fyurr booking app
 
-This app was meant to be able to join the artists and the venues. It allows artists to list themselves on the platform and the same for the venues. Then each of them would indicate if they were looking ofr venues and talents respectively. Finally, the artists could list concerts by joining their profile to the venue and display all these informations at once.
+This app was meant to be able to join the artists and the venues. It allows artists to list themselves on the platform and the same for the venues. Then each of them would indicate if they were looking for venues and talents respectively. Finally, the artists could list concerts by joining their profile to the venue and display all these informations at once.
 
 <u>Tech stack</u>:
 
