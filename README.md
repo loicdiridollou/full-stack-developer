@@ -30,7 +30,16 @@ This second project was aimed at interfacing an SQL database with a `React` fron
 
 ## Project 3: Coffee shop full stack
 
+The third project was designed to implement authentification methods based on Json Web Token (JWT) to control the access to the app.
 
+<u>Tech stack</u>:
+- `Python` for the backend code
+- `Flask` as the basis of the backend
+- `Ionic` for the frontend (already implemented in the starter code)
+- `Auth0` to power the authentification and permission service
+- `jose` for encoding and decoding the JWT tokens
+- `Postman` to have a visual interface when making requests to the website
+- `curl` to make requests directly from the terminal
 
 ## Project 4: Containerize and deploy an app on AWS EKS
 
