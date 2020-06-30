@@ -43,6 +43,16 @@ The third project was designed to implement authentification methods based on Js
 
 ## Project 4: Containerize and deploy an app on AWS EKS
 
+Finally before jumping into the capstone project, I have explored the CI/CD pipelines and containerization with Docker.
 
+<u>Tech stack</u>:
+- `Python` for the backend code
+- `Flask` as the basis of the backend
+- `Docker` to containerize my app
+- `AWS EKS` to host the container on Kubernetes
+- `awscli` to in 
+- `kubectl` to interact with Kubernetes clusters and pods (from the Terminal)
+- `ekscli` to crete the container from the Terminal
 
 ## Project 5: Capstone project
+
