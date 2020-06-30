@@ -9,6 +9,7 @@ The tech stack that I used all along is mostly Python and some inputs of JavaScr
 This app was meant to be able to join the artists and the venues. It allows artists to list themselves on the platform and the same for the venues. Then each of them would indicate if they were looking ofr venues and talents respectively. Finally, the artists could list concerts by joining their profile to the venue and display all these informations at once.
 
 <u>Tech stack</u>:
+
 - `Python`
 - `SQLAlchemy`
 - `Flask`
@@ -20,6 +21,7 @@ This app was meant to be able to join the artists and the venues. It allows arti
 This second project was aimed at interfacing an SQL database with a `React` frontend to manage the questions of a Trivia game. These questions would later be used to power the Quizz Gameplay.
 
 <u>Tech stack</u>:
+
 - `React` (already implemented in the starter code) for the browser interaction
 - `Python` for the backend code
 - `Flask` as the basis of the backend
@@ -33,6 +35,7 @@ This second project was aimed at interfacing an SQL database with a `React` fron
 The third project was designed to implement authentification methods based on Json Web Token (JWT) to control the access to the app.
 
 <u>Tech stack</u>:
+
 - `Python` for the backend code
 - `Flask` as the basis of the backend
 - `Ionic` for the frontend (already implemented in the starter code)
@@ -46,6 +49,7 @@ The third project was designed to implement authentification methods based on Js
 Finally before jumping into the capstone project, I have explored the CI/CD pipelines and containerization with Docker.
 
 <u>Tech stack</u>:
+
 - `Python` for the backend code
 - `Flask` as the basis of the backend
 - `Docker` to containerize my app
@@ -56,3 +60,15 @@ Finally before jumping into the capstone project, I have explored the CI/CD pipe
 
 ## Project 5: Capstone project
 
+For this final project, I have decided to go with the plan that was advised: building an API than stores actors and movies information into a database. Furthermore, it includes some identification to monitor the access and permissions of users.
+
+<u>Tech stack</u>:
+
+- `Python` for the backend code
+- `Flask` as the basis of the backend
+- `PostgreSQL` to host the data of actors and movies
+- `Heroku` to deploy the app on the web
+- `Auth0` to power the authentification and permission service
+- `jose` for encoding and decoding the JWT tokens
+- `Postman` to have a visual interface when making requests to the website
+- `curl` to make requests directly from the terminal
