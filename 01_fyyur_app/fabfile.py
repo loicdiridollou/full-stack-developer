@@ -1,4 +1,4 @@
-from fabric.api import local, settings, abort
+from fabric.api import abort, local, settings
 from fabric.contrib.console import confirm
 
 # prepare for deployment
@@ -14,7 +14,7 @@ def test():
 
 
 def commit():
-    message = raw_input("Enter a git commit message: ")
+    message = input("Enter a git commit message: ")
     local("git add . && git commit -am '{}'".format(message))
 
 
@@ -26,6 +26,7 @@ def prepare():
     test()
     commit()
     push()
+
 
 # deploy to heroku
 
@@ -39,9 +40,7 @@ def heroku():
 
 
 def heroku_test():
-    local(
-        "heroku run python test_tasks.py -v && heroku run python test_users.py -v"
-    )
+    local("heroku run python test_tasks.py -v && heroku run python test_users.py -v")
 
 
 def deploy():
@@ -50,6 +49,7 @@ def deploy():
     commit()
     heroku()
     heroku_test()
+
 
 # rollback
 
