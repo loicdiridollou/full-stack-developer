@@ -1,20 +1,5 @@
-// This file is required by karma.conf.js and loads recursively all the .spec and framework files
+// This file is loaded by the Vitest-based unit-test builder as a setup file.
+// Test environment initialization and spec discovery are handled automatically.
 
-import 'zone.js/dist/zone-testing';
-import { getTestBed } from '@angular/core/testing';
-import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting
-} from '@angular/platform-browser-dynamic/testing';
-
-declare const require: any;
-
-// First, initialize the Angular testing environment.
-getTestBed().initTestEnvironment(
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting()
-);
-// Then we find all the tests.
-const context = require.context('./', true, /\.spec\.ts$/);
-// And load the modules.
-context.keys().map(context);
+import 'zone.js/testing';
+import 'zone.js/plugins/vitest-patch';

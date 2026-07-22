@@ -7,11 +7,11 @@ import { environment } from 'src/environments/environment';
 export interface Drink {
   id: number;
   title: string;
-  recipe: Array<{
+  recipe: {
           name: string,
           color: string,
           parts: number
-        }>;
+        }[];
 }
 
 @Injectable({
@@ -21,7 +21,7 @@ export class DrinksService {
 
   url = environment.apiServerUrl;
 
-  public items: {[key: number]: Drink} = {};
+  public items: Record<number, Drink> = {};
   // = {
   //                             1: {
   //                             id: 1,
@@ -129,12 +129,10 @@ export class DrinksService {
   deleteDrink(drink: Drink) {
     delete this.items[drink.id];
     this.http.delete(this.url + '/drinks/' + drink.id, this.getHeaders())
-    .subscribe( (res: any) => {
-
-    });
+    .subscribe();
   }
 
-  drinksToItems( drinks: Array<Drink>) {
+  drinksToItems( drinks: Drink[]) {
     for (const drink of drinks) {
       this.items[drink.id] = drink;
     }

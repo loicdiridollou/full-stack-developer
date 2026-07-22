@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DrinksService, Drink } from '../../services/drinks.service';
 import { ModalController } from '@ionic/angular';
 import { DrinkFormComponent } from './drink-form/drink-form.component';
@@ -6,7 +6,9 @@ import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-drink-menu',
+  standalone: false,
   templateUrl: './drink-menu.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./drink-menu.page.scss'],
 })
 export class DrinkMenuPage implements OnInit {
@@ -22,7 +24,7 @@ export class DrinkMenuPage implements OnInit {
     this.drinks.getDrinks();
   }
 
-  async openForm(activedrink: Drink = null) {
+  async openForm(activedrink: Drink | null = null) {
     if (!this.auth.can('get:drinks-detail')) {
       return;
     }
