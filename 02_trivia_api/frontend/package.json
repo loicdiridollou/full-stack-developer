@@ -4,12 +4,14 @@
   "private": true,
   "proxy": "http://127.0.0.1:5000/",
   "dependencies": {
-    "corsproxy": "*",
     "jquery": "*",
     "react": "*",
     "react-dom": "*",
     "react-router-dom": "*",
     "react-scripts": "*"
+  },
+  "overrides": {
+    "form-data": "^3.0.5"
   },
   "scripts": {
     "start": "node node_modules/react-scripts/scripts/start.js",
