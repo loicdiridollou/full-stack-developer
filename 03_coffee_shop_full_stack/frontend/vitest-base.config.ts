@@ -7,5 +7,10 @@ export default defineConfig({
         inline: [/@ionic\/core/, /@ionic\/angular/],
       },
     },
+    environmentOptions: {
+      jsdom: {
+        url: 'http://localhost/',
+      },
+    },
   },
 });

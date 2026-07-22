@@ -1,6 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
-import { ModalController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 
 import { DrinkFormComponent } from './drink-form.component';
 
@@ -11,8 +11,8 @@ describe('DrinkFormComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ DrinkFormComponent ],
+      imports: [ IonicModule.forRoot() ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      providers: [ ModalController ],
     })
     .compileComponents();
   }));
